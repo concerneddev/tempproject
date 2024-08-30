@@ -54,9 +54,15 @@ export const listCreate = async (req, res) => {
         liststatus: true,
       });
 
+      // Add the new list ID to the guide's lists array
+      guide.lists.push(list._id);
+
+      // Save the updated guide
+      await guide.save();
+
       return res
         .status(201)
-        .send({ message: "List created successfully", list });
+        .send({ message: "List created successfully", list, guide });
     }
   } catch (error) {
     return res
@@ -114,8 +120,8 @@ export const listRegister = async (req, res) => {
     const listId = req.params.listid;
     let list = await List.findById(listId);
 
-    if(list.liststatus == false) {
-        return res.status(400).send({ message: "List is closed. "});
+    if (list.liststatus == false) {
+      return res.status(400).send({ message: "List is closed. " });
     }
 
     if (!list) {
@@ -142,11 +148,90 @@ export const listRegister = async (req, res) => {
   }
 };
 
-export const listStatusClose = () => {};
+export const listStatusClose = async () => {
+  try {
+    // check if user is logged in
+    if (!req.decodedUserId) {
+      return res.status(401).send({ message: "Access denied." });
+    }
 
-export const listDisplayGuideList = () => {};
+    // get the User object
+    const guideId = req.decodedUserId;
+    let guide = await Guide.findById(guideId);
+    if (!guide) {
+      return res.status(401).send({ message: "Register first." });
+    }
 
-export const listDisplayGuideDetail = () => {};
+    // Check if the list exists
+    const listId = req.params.listid;
+    let list = await List.findById(listId);
+
+    if (!list) {
+      return res.status(404).send({ message: "List not found." });
+    } else {
+      // Update liststatus to false
+      list.liststatus = false;
+
+      // Save the updated list
+      list = await list.save();
+
+      return res
+        .status(200)
+        .send({ message: "List updated successfully", list });
+    }
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ message: "Server error", error: error.message });
+  }
+};
+
+export const listDisplayGuideList = async (req, res) => {
+  try {
+    // check if user is logged in
+    if (!req.decodedUserId) {
+      return res.status(401).send({ message: "Access denied." });
+    }
+
+    // get the User object
+    const guideId = req.decodedUserId;
+    let guide = await Guide.findById(guideId);
+    if (!guide) {
+      return res.status(401).send({ message: "Register first." });
+    }
+
+    const lists = await List.find();
+
+    // Structure the list objects to remove redundant values
+    const structuredLists = lists.map(list => ({
+        _id: list._id,
+        listTitle: list.listTitle,
+        guideData: list.guideData,
+        touristData: list.touristData.map(tourist => ({
+          tourist: tourist.tourist,
+          datefrom: tourist.datefrom,
+          dateto: tourist.dateto
+        })),
+        liststatus: list.liststatus
+      }));
+    
+    return res.status(200).send({ message: "Lists retrieved successfully", lists: structuredLists });
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ message: "Server error", error: error.message });
+  }
+};
+
+export const listDisplayGuideDetail = async (req, res) => {
+  try {
+
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ message: "Server error", error: error.message });
+  }
+};
 
 export const listDisplayTouristList = () => {};
 
