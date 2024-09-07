@@ -18,7 +18,6 @@ const listSchema = new mongoose.Schema(
         type: String,
         required: true,
       },
-
       specialities: {
         type: [String],
         required: true,
@@ -42,6 +41,10 @@ const listSchema = new mongoose.Schema(
         }
       },
     ],
+    description: {
+      type: String,
+      required: true,
+    },
     liststatus: {
       type: Boolean,
       required: true,

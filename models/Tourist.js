@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { List } from "./List.js";
 
 const touristSchema = mongoose.Schema(
   {
@@ -28,8 +29,14 @@ const touristSchema = mongoose.Schema(
     password: {
         type: String,
         required: true
-    }
-  },
+    },
+    lists: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "List",
+      }
+    ],
+  },      
   {
     timestamps: true,
   }

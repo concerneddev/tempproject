@@ -4,6 +4,7 @@ import mongoose, { mongo } from "mongoose";
 import cors from "cors";
 import authRoute from "./routes/authRoute.js";
 import listActionsRoute from "./routes/listActionsRoute.js";
+import dashboardRoute from "./routes/dashboardRoute.js";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.get("/", (request, response) => {
 // routes
 app.use("/auth", authRoute);
 app.use("/list", listActionsRoute);
+app.use("/dashboard", dashboardRoute);
 
 // connection
 mongoose

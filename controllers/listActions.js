@@ -2,6 +2,46 @@ import { Tourist } from "../models/Tourist.js";
 import { Guide } from "../models/Guide.js";
 import { List } from "../models/List.js";
 
+// ----- GUIDE LIST ACTIONS -----
+export const listStatusClose = async () => {
+  try {
+    // check if user is logged in
+    if (!req.decodedUserId) {
+      return res.status(401).send({ message: "Access denied." });
+    }
+
+    // get the User object
+    const guideId = req.decodedUserId;
+    let guide = await Guide.findById(guideId);
+    if (!guide) {
+      return res.status(401).send({ message: "Register first." });
+    }
+
+    // Check if the list exists
+    const listId = req.params.listid;
+    let list = await List.findById(listId);
+
+    if (!list) {
+      return res.status(404).send({ message: "List not found." });
+    } else {
+      // Update liststatus to false
+      list.liststatus = false;
+
+      // Save the updated list
+      list = await list.save();
+
+      return res
+        .status(200)
+        .send({ message: "List updated successfully", list });
+    }
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ message: "Server error", error: error.message });
+  }
+};
+
+
 /*
 {
     "listtitle": "listone",
@@ -24,13 +64,13 @@ export const listCreate = async (req, res) => {
       return res.status(401).send({ message: "Register first." });
     }
 
-    const { listtitle, location, specialities, experience } = req.body;
+    const { listtitle, location, specialities, experience, description } = req.body;
 
     // Check for missing fields
-    if (!listtitle || !location || !specialities || !experience) {
+    if (!listtitle || !location || !specialities || !experience || !description) {
       return res.status(400).send({
         message:
-          "Please provide all required fields: listtitle, location, specialities, experience.",
+          "Please provide all required fields: listtitle, location, specialities, experience and description.",
       });
     }
 
@@ -51,6 +91,7 @@ export const listCreate = async (req, res) => {
           experience: experience,
         },
         touristData: [], // Initialize as an empty array
+        description: description,
         liststatus: true,
       });
 
@@ -71,6 +112,98 @@ export const listCreate = async (req, res) => {
   }
 };
 
+export const listDisplayGuideList = async (req, res) => {
+  try {
+    // check if user is logged in
+    if (!req.decodedUserId) {
+      return res.status(401).send({ message: "Access denied." });
+    }
+
+    // get the User object
+    const guideId = req.decodedUserId;
+    let guide = await Guide.findById(guideId);
+    if (!guide) {
+      return res.status(401).send({ message: "Register first." });
+    }
+
+    const lists = await List.find().populate("guideData.guide");
+
+    // Structure the list objects to remove redundant values
+    const structuredLists = lists.map((list) => ({
+      _id: list._id,
+      listTitle: list.listTitle,
+      listLocation: list.guideData.location,
+      guideId: list.guideData.guide._id,
+      guideFirstName: list.guideData.guide.firstname,
+      guideLastName: list.guideData.guide.lastname,
+      guideEmailId: list.guideData.guide.emailid,
+      guidePhoneNo: list.guideData.guide.phonenumber,
+      touristsRegistered: list.touristData.length,
+      listDescription: list.description,
+      liststatus: list.liststatus,
+    }));
+
+    return res.status(200).send({
+      message: "Lists retrieved successfully",
+      lists: structuredLists,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ message: "Server error", error: error.message });
+  }
+};
+
+export const listDisplayGuideDetail = async (req, res) => {
+  try {
+    // check if user is logged in
+    if (!req.decodedUserId) {
+      return res.status(401).send({ message: "Access denied." });
+    }
+
+    // Check if the list exists
+    const listId = req.params.listid;
+    let list = await List.findById(listId)
+      .populate("guideData.guide")
+      .populate("touristData.tourist");
+
+    const structuredList = {
+      _id: list._id,
+      listTitle: list.listTitle,
+      guideData: {
+        guideId: list.guideData.guide._id,
+        guideFirstName: list.guideData.guide.firstname,
+        guideLastName: list.guideData.guide.lastname,
+        guideEmailId: list.guideData.guide.emailid,
+        guidePhoneNo: list.guideData.guide.phonenumber,
+        guideExperience: list.guideData.guide.experience,
+      },
+      location: list.guideData.location,
+      touristData: list.touristData.map((tourist) => ({
+        touristId: tourist.tourist._id,
+        touristFirstName: tourist.tourist.firstname,
+        touristLastName: tourist.tourist.lastname,
+        touristEmailId: tourist.tourist.emailid,
+        touristPhoneNo: tourist.tourist.phonenumber,
+        datefrom: tourist.datefrom,
+        dateto: tourist.dateto,
+      })),
+      listDescription: list.description,
+      touristsRegistered: list.touristData.length,
+      liststatus: list.liststatus,
+    };
+
+    return res.status(200).send({
+      list: structuredList
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ message: "Server error", error: error.message });
+  }
+};
+
+// ---------- TOURIST LIST ACTIONS ----------
 /*
 {
     "datefrom": "2024-09-01",
@@ -137,6 +270,9 @@ export const listRegister = async (req, res) => {
       // Save the updated list
       list = await list.save();
 
+      tourist.lists.push(list._id);
+
+      await tourist.save();
       return res
         .status(200)
         .send({ message: "List updated successfully", list });
@@ -148,7 +284,7 @@ export const listRegister = async (req, res) => {
   }
 };
 
-export const listStatusClose = async () => {
+export const listDisplayTouristList = async (req, res) => {
   try {
     // check if user is logged in
     if (!req.decodedUserId) {
@@ -156,83 +292,75 @@ export const listStatusClose = async () => {
     }
 
     // get the User object
-    const guideId = req.decodedUserId;
-    let guide = await Guide.findById(guideId);
-    if (!guide) {
+    const touristId = req.decodedUserId;
+    let tourist = await Tourist.findById(touristId);
+    if (!tourist) {
       return res.status(401).send({ message: "Register first." });
+    }
+
+    const lists = await List.find().populate("guideData.guide");
+
+    // Structure the list objects to remove redundant values
+    const structuredLists = lists.map((list) => ({
+      _id: list._id,
+      listTitle: list.listTitle,
+      listLocation: list.guideData.location,
+      guideId: list.guideData.guide._id,
+      guideFirstName: list.guideData.guide.firstname,
+      guideLastName: list.guideData.guide.lastname,
+      guideEmailId: list.guideData.guide.emailid,
+      guidePhoneNo: list.guideData.guide.phonenumber,
+      listDescription: list.description,
+      touristsRegistered: list.touristData.length,
+      liststatus: list.liststatus,
+    }));
+
+    return res.status(200).send({
+      message: "Lists retrieved successfully",
+      lists: structuredLists,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ message: "Server error", error: error.message });
+  }
+};
+
+export const listDisplayTouristDetail = async (req, res) => {
+  try {
+    // check if user is logged in
+    if (!req.decodedUserId) {
+      return res.status(401).send({ message: "Access denied." });
     }
 
     // Check if the list exists
     const listId = req.params.listid;
-    let list = await List.findById(listId);
+    let list = await List.findById(listId)
+      .populate("guideData.guide")
 
-    if (!list) {
-      return res.status(404).send({ message: "List not found." });
-    } else {
-      // Update liststatus to false
-      list.liststatus = false;
+    const structuredList = {
+      _id: list._id,
+      listTitle: list.listTitle,
+      guideData: {
+        guideId: list.guideData.guide._id,
+        guideFirstName: list.guideData.guide.firstname,
+        guideLastName: list.guideData.guide.lastname,
+        guideEmailId: list.guideData.guide.emailid,
+        guidePhoneNo: list.guideData.guide.phonenumber,
+        guideExperience: list.guideData.experience,
+      },
+      location: list.guideData.location,
+      listDescription: list.description,
+      touristsRegistered: list.touristData.length,
+      liststatus: list.liststatus,
+    };
 
-      // Save the updated list
-      list = await list.save();
-
-      return res
-        .status(200)
-        .send({ message: "List updated successfully", list });
-    }
+    return res.status(200).send({
+      list: structuredList
+    });
   } catch (error) {
     return res
       .status(500)
       .send({ message: "Server error", error: error.message });
   }
 };
-
-export const listDisplayGuideList = async (req, res) => {
-  try {
-    // check if user is logged in
-    if (!req.decodedUserId) {
-      return res.status(401).send({ message: "Access denied." });
-    }
-
-    // get the User object
-    const guideId = req.decodedUserId;
-    let guide = await Guide.findById(guideId);
-    if (!guide) {
-      return res.status(401).send({ message: "Register first." });
-    }
-
-    const lists = await List.find();
-
-    // Structure the list objects to remove redundant values
-    const structuredLists = lists.map(list => ({
-        _id: list._id,
-        listTitle: list.listTitle,
-        guideData: list.guideData,
-        touristData: list.touristData.map(tourist => ({
-          tourist: tourist.tourist,
-          datefrom: tourist.datefrom,
-          dateto: tourist.dateto
-        })),
-        liststatus: list.liststatus
-      }));
-    
-    return res.status(200).send({ message: "Lists retrieved successfully", lists: structuredLists });
-  } catch (error) {
-    return res
-      .status(500)
-      .send({ message: "Server error", error: error.message });
-  }
-};
-
-export const listDisplayGuideDetail = async (req, res) => {
-  try {
-
-  } catch (error) {
-    return res
-      .status(500)
-      .send({ message: "Server error", error: error.message });
-  }
-};
-
-export const listDisplayTouristList = () => {};
-
-export const listDisplayTouristDetail = () => {};
