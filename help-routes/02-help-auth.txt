@@ -1,0 +1,144 @@
+#################### AUTHENTICAION ROUTES ####################
+
+01 Guide Registration
+
+POST: "http://localhost:5555/auth/registerguide"
+
+request body:
+{
+    "firstname": "",
+    "lastname": "",
+    "emailid": "",
+    "phonenumber": "",
+    "password": ""
+}
+
+all responses:
+STATUS 400:
+{
+    message: "Send all required fields: firstname, lastname, emailid, phonenumber, password",
+}
+
+STATUS 400:
+{ 
+    message: "User already exists." 
+}
+
+STATUS 201:
+{ 
+    message: "User registered successfully." 
+}
+
+STATUS 500:
+{ 
+    message: error.message 
+}
+
+02 Guide Login
+
+POST: "http://localhost:5555/auth/loginguide"
+
+request body:
+{
+    "emailid": "",
+    "password": ""
+}
+
+all responses:
+STATUS 400:
+{
+    message: "Send all required fields: username and password.",
+}
+
+STATUS 400:
+{
+    message: "Invalid credentials.",
+}
+
+STATUS 401:
+{ 
+    message: "Invalid credentials." 
+}
+
+STATUS 201:
+{ 
+    token: token, 
+    userId: userId 
+}
+
+STATUS 500:
+{ 
+    message: error.message 
+}
+
+01 Tourist Registration
+
+"http://localhost:5555/auth/registertourist"
+
+request body:
+{
+    "firstname": "",
+    "lastname": "",
+    "emailid": "",
+    "phonenumber": "",
+    "password": ""
+}
+
+all responses:
+STATUS 400:
+{
+    message: "Send all required fields: firstname, lastname, emailid, phonenumber, password",
+}
+
+STATUS 400:
+{ 
+    message: "User already exists." 
+}
+
+STATUS 201:
+{ 
+    message: "User registered successfully." 
+}
+
+STATUS 500:
+{ 
+    message: error.message 
+}
+
+02 Tourist loginTourist
+
+"http://localhost:5555/auth/logintourist"
+
+request body:
+{
+    "emailid": "",
+    "password": ""
+}
+
+all responses:
+STATUS 400:
+{
+    message: "Send all required fields: username and password.",
+}
+
+STATUS 400:
+{
+    message: "Invalid credentials.",
+}
+
+STATUS 401:
+{ 
+    message: "Invalid credentials." 
+}
+
+STATUS 201:
+{ 
+    token: token, 
+    userId: userId 
+}
+
+STATUS 500:
+{ 
+    message: error.message 
+}
+

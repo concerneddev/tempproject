@@ -3,7 +3,7 @@ import { Guide } from "../models/Guide.js";
 import { List } from "../models/List.js";
 
 // ----- GUIDE LIST ACTIONS -----
-export const listStatusClose = async () => {
+export const listStatusClose = async (req, res) => {
   try {
     // check if user is logged in
     if (!req.decodedUserId) {

@@ -1,0 +1,19 @@
+#################### ROUTES INFO ####################
+
+SERVER_URL: http://localhost:5555/
+
+AUTHENTICAION ROUTES:
+
+02-help-auth.txt
+
+DASHBOARD ROUTES:
+
+03-help-dashboard.txt
+
+GUIDE LIST-ACTIONS ROUTES
+
+04-help-guide-list-actions.txt
+
+TOURIST LIST-ACTIONS ROUTES
+
+05-help-tourist-list-actions.txt

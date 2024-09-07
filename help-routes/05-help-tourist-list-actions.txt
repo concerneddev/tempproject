@@ -1,0 +1,212 @@
+#################### TOURIST LIST-ACTION ROUTES ####################
+
+01 REGISTER LIST (AUTH PROTECTED ROUTE)
+
+POST: "http://localhost:5555/list/listregister/:listid"
+
+request header:
+
+x-auth-token: ""
+
+request body:
+
+{
+    "datefrom": "2024-09-01",
+    "dateto": "2024-09-07"
+}
+
+responses:
+STATUS 400:
+{
+    message: "Please provide both datefrom and dateto."
+}
+
+STATUS 400:
+{
+    message: "Date fields must be in yyyy-mm-dd format."
+}
+
+STATUS 400:
+{
+    message: "List is closed. "
+}
+
+STATUS 500:
+{ 
+    message: "Server error", error: error.message 
+}
+
+STATUS 401:
+{
+    message: "Register first."
+}
+
+STATUS 401:
+{
+    message: "Access denied."
+}
+
+STATUS 404:
+{
+    message: "List not found."
+}
+
+STATUS 200:
+
+{
+    "message": "List updated successfully",
+    "list": {
+        "guideData": {
+            "guide": "66dca0815e4be320e2c4e6a1",
+            "location": "location",
+            "specialities": [
+                "specialityone",
+                "specialitytwo",
+                "specialitythree"
+            ],
+            "experience": "experience paragraph"
+        },
+        "_id": "66dca0c45e4be320e2c4e6ab",
+        "listTitle": "listtwo",
+        "touristData": [
+            {
+                "tourist": "66dca0f65e4be320e2c4e6af",
+                "datefrom": "2024-09-01T00:00:00.000Z",
+                "dateto": "2024-09-07T00:00:00.000Z",
+                "_id": "66dca1545e4be320e2c4e6b9"
+            },
+            {
+                "tourist": "66dca0f65e4be320e2c4e6af",
+                "datefrom": "2024-09-01T00:00:00.000Z",
+                "dateto": "2024-09-07T00:00:00.000Z",
+                "_id": "66dcb07cdb85593f93af201d"
+            }
+        ],
+        "description": "description paragraph",
+        "liststatus": true,
+        "createdAt": "2024-09-07T18:51:48.979Z",
+        "updatedAt": "2024-09-07T19:58:52.864Z",
+        "__v": 2
+    }
+}
+
+02 LIST DETAIL (AUTH PROTECTED ROUTE)
+
+GET: "http://localhost:5555/list//listdiplaytouristdetail/:listid"
+
+request header:
+
+x-auth-token: ""
+
+request body:
+
+NO BODY
+
+responses:
+
+STATUS 500:
+{ 
+    message: "Server error", error: error.message 
+}
+
+STATUS 401:
+{
+    message: "Access denied."
+}
+
+STATUS 200:
+
+{
+    "list": {
+        "_id": "66dca0c45e4be320e2c4e6ab",
+        "listTitle": "listtwo",
+        "guideData": {
+            "guideId": "66dca0815e4be320e2c4e6a1",
+            "guideFirstName": "guideone",
+            "guideLastName": "guideone",
+            "guideEmailId": "guideone@gmail.com",
+            "guidePhoneNo": 1111111111,
+            "guideExperience": "experience paragraph"
+        },
+        "location": "location",
+        "listDescription": "description paragraph",
+        "touristsRegistered": 2,
+        "liststatus": true
+    }
+}
+
+03 LIST ALL LISTS (AUTH PROTECTED ROUTE)
+
+GET: "http://localhost:5555/list/listdiplaytouristlist"
+
+request header:
+
+x-auth-token: ""
+
+request body:
+
+NO BODY
+
+responses:
+
+STATUS 500:
+{ 
+    message: "Server error", error: error.message 
+}
+
+STATUS 401:
+{
+    message: "Access denied."
+}
+
+STATUS 401:
+{
+    message: "Register first."
+}
+
+STATUS 200:
+
+{
+    "message": "Lists retrieved successfully",
+    "lists": [
+        {
+            "_id": "66dca0b05e4be320e2c4e6a6",
+            "listTitle": "listone",
+            "listLocation": "location",
+            "guideId": "66dca0815e4be320e2c4e6a1",
+            "guideFirstName": "guideone",
+            "guideLastName": "guideone",
+            "guideEmailId": "guideone@gmail.com",
+            "guidePhoneNo": 1111111111,
+            "listDescription": "description paragraph",
+            "touristsRegistered": 1,
+            "liststatus": false
+        },
+        {
+            "_id": "66dca0c45e4be320e2c4e6ab",
+            "listTitle": "listtwo",
+            "listLocation": "location",
+            "guideId": "66dca0815e4be320e2c4e6a1",
+            "guideFirstName": "guideone",
+            "guideLastName": "guideone",
+            "guideEmailId": "guideone@gmail.com",
+            "guidePhoneNo": 1111111111,
+            "listDescription": "description paragraph",
+            "touristsRegistered": 2,
+            "liststatus": true
+        },
+        {
+            "_id": "66dcaaf0fa3c44c27fd98639",
+            "listTitle": "listthree",
+            "listLocation": "location",
+            "guideId": "66dca0815e4be320e2c4e6a1",
+            "guideFirstName": "guideone",
+            "guideLastName": "guideone",
+            "guideEmailId": "guideone@gmail.com",
+            "guidePhoneNo": 1111111111,
+            "listDescription": "description paragraph",
+            "touristsRegistered": 0,
+            "liststatus": true
+        }
+    ]
+}

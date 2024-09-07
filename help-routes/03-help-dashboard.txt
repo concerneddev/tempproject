@@ -1,0 +1,123 @@
+#################### DASHBOARD ROUTES ####################
+
+01 Tourist Dasboard (AUTH PROTECTED ROUTE)
+
+GET: "http://localhost:5555/dashboard/tourist"
+
+request header:
+
+x-auth-token: ""
+
+request body:
+
+NO BODY
+
+responses:
+
+STATUS 500:
+{ 
+    message: "Server error", error: error.message 
+}
+
+STATUS 401:
+{
+    message: "Register first."
+}
+
+STATUS 401:
+{
+    message: "Access denied."
+}
+
+STATUS 200:
+
+{
+    "touristData": {
+        "touristId": "",
+        "touristFirstName": "",
+        "touristLastName": "",
+        "touristEmailId": "",
+        "touristPhoneNo": 
+    },
+    "mylists": [
+        {
+            "_id": "",
+            "listTitle": "",
+            "listLocation": "",
+            "guideId": "",
+            "touristsRegistered": ,
+            "listDescription": "",
+            "liststatus": 
+        },
+        {
+            "_id": "",
+            "listTitle": "",
+            "listLocation": "",
+            "guideId": "",
+            "touristsRegistered": ,
+            "listDescription": "",
+            "liststatus": 
+        }
+    ]
+}
+
+02 Guide Dasboard (AUTH PROTECTED ROUTE)
+
+GET: "http://localhost:5555/dashboard/guide"
+
+request header:
+
+x-auth-token: ""
+
+request body:
+
+NO BODY
+
+responses:
+
+STATUS 500:
+{ 
+    message: "Server error", error: error.message 
+}
+
+STATUS 401:
+{
+    message: "Register first."
+}
+
+STATUS 401:
+{
+    message: "Access denied."
+}
+
+STATUS 200:
+
+{
+    "guideData": {
+        "guideId": "",
+        "guideFirstName"",
+        "guideLastName"",
+        "guideEmailId": "",
+        "guidePhoneNo":
+    },
+    "lists": [
+        {
+            "_id": "",
+            "listTitle": "",
+            "listLocation": "",
+            "guideId": "",
+            "touristsRegistered": ,
+            "listDescription": "",
+            "liststatus": 
+        },
+        {
+            "_id": "",
+            "listTitle": "",
+            "listLocation": "",
+            "guideId": "",
+            "touristsRegistered": ,
+            "listDescription": "",
+            "liststatus": 
+        }
+    ]
+}
